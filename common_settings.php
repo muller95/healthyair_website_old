@@ -255,7 +255,7 @@
 								<button type="button" name="submit" class="btn btn-success btn-lg" 
 				                		onclick="try_add_station()">Добавить</button>
 			                </div>
-		                </div>>
+		                </div>
 					</div>
 				</div>
 
