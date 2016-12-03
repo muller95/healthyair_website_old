@@ -15,11 +15,11 @@
 	}
 
 
-	echo '<div class="panel panel-default pre-scrollable">';
+	echo '<div class="panel panel-default pre-scrollable" 
+		style="min-height:600px">';
 	echo '<div class="panel-heading">Категории помещений</div>';
-		
 	echo '<table class="table" table="table_categories">';
-		
+
 	echo '<thead>';
     echo '<tr>';
     echo '<th></th>';
@@ -58,7 +58,8 @@
 		echo '<tr>';
 
 		printf('<td><div class="radio"><label><input type="radio" 
-			name="category_radio" value="%d"></label></div></td>', 
+			name="category_radio" value="%d" 
+			onclick="set_active_category(this)"></label></div></td>', 
 			$category_id);
 
 		printf("<td>%s</td>", $category_name);
@@ -73,28 +74,16 @@
 		printf("<td>0—%d</td>", $co2_good_high);
 		printf("<td>0—%d</td>", $co2_norm_high);
 
-		/*	echo '<td>';
-			printf ('<input type="password" class="form-control" 
-				id="worker%d_passwd" placeholder="Новый пароль">', $worker_id);
-			echo '</td>';
-
-			echo '<td>';
-
-			printf('<button type="button" name="submit" class="btn btn-success" 
-				onclick="try_update_worker(%d, %d)">Подтвердить</button>',
-				$company_id, $worker_id);
-
-			printf('<button type="button" name="submit" class="btn btn-danger" 
-				onclick="delete_worker(%d, %d)"
-				style="margin-left:2%%">Удалить</button>',
-				$company_id, $worker_id);*
-
-			echo '</td>';*/
+		if ($row['user_id'] != -1)
+			printf('<td><button type="button" name="submit" class="btn btn-danger" 
+				onclick="delete_category(%d)">Удалить</button></td>',
+				$category_id);
 
 			echo '</tr>';
 	}
 
 	echo '</tbody>';
 	echo '</table>';
+
 	echo '</div>';
 ?>

@@ -13,6 +13,7 @@
 	else {
 		while (($row = $result->fetch_array()))
 			printf ('<button type="button" name="%s" class="list-group-item" 
-				onclick="set_station(\'%s\')">%s</button>', $row['name'], $row['name'], $row['name']);
+				onclick="set_station(\'%s\')">%s</button>', 
+				$row['name'], $row['name'], $row['name']);
 	}
 ?>

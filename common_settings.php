@@ -39,7 +39,9 @@
 		<![endif]-->
 
 		<script src="jquery-3.1.0.min.js"></script>
-		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" 
+			src="https://www.gstatic.com/charts/loader.js"></script>
 
 		<script type="text/javascript">
 			var stname = null;
@@ -50,7 +52,8 @@
 			}
 
 			function set_station(name) {
-				var stations_btns = document.getElementById('stations').children;
+				var stations_btns = document.getElementById('stations').
+					children;
 				var prev_name;
 				prev_stname = stname;
 				stname = name;
@@ -60,7 +63,9 @@
 						stations_btns[i].className = "list-group-item active";
 					else if (stations_btns[i].name == prev_stname)
 						stations_btns[i].className = "list-group-item";
-					
+
+
+				get_active_category();					
 			}
 
 			function try_add_station() {
@@ -111,32 +116,118 @@
     			$.get("try_get_categories.php",  
     				function(data) {
             			document.getElementById('categories').innerHTML = data;
-            			set_active_category();
+            			get_active_category();
           			});
     		
     		}
 
-    		function set_active_category() {
-    			var radios = document.getElementsByName('category_radio');
+    		function get_active_category() {
+    			if (stname)
+    				$.post("get_station_category.php", 
+    					{ station_name: stname }, 
+    					function (data) {
+    						var radios = document.
+    							getElementsByName('category_radio');
 
-    			radios[0].checked = true;
+    						for (var i = 0; i < radios.length; i++)
+    							if (radios[i].value == data)
+    								radios[i].checked = true;
+    					});
+    		}
+
+    		function set_active_category(radio) {
+    			$.post("set_active_category.php", { category_id: radio.value,
+    				station_name: stname });
+    		}
+
+    		function try_add_category() {
+    			var t_good_low, t_good_high, t_norm_low, t_norm_high;
+    			var	rh_good_low, rh_good_high, rh_norm_low, rh_norm_high;
+    			var co2_good_high, co2_norm_high;
+    			var category_desc;
+
+    			t_good_low = document.getElementById('t_good_low').value;
+    			t_good_high = document.getElementById('t_good_high').value;
+    			t_norm_low = document.getElementById('t_norm_low').value;
+    			t_norm_high = document.getElementById('t_norm_high').value;
+
+    			rh_good_low = document.getElementById('rh_good_low').value;
+    			rh_good_high = document.getElementById('rh_good_high').value;
+    			rh_norm_low = document.getElementById('rh_norm_low').value;
+    			rh_norm_high = document.getElementById('rh_norm_high').value;
+
+    			co2_good_high = document.getElementById('co2_good_high').value;
+    			co2_norm_high = document.getElementById('co2_norm_high').value;
+
+    			category_desc = document.getElementById('category_desc').value;
+    			category_name = document.getElementById('category_name').value;
+
+    			alert(rh_good_high);
+
+    			$.post("try_add_category.php", { category_name: category_name,
+    				category_desc: category_desc, t_good_low: t_good_low, 
+    				t_good_high:t_good_high, t_norm_low: t_norm_low,
+    				t_norm_high: t_norm_high, rh_good_low: rh_good_low, 
+    				rh_good_high: rh_good_high, rh_norm_low: rh_norm_low,
+    				rh_norm_high: rh_norm_high, co2_good_high: co2_good_high,
+    				co2_norm_high: co2_norm_high },
+    				function (data) {
+    					alert(data);
+    				});
+    		}
+
+    		function delete_category(category_id) {
+    			$.post("delete_category.php", { category_id: category_id }, 
+    				function (data) {
+    					try_get_categories();
+    				});
     		}
 		</script>
 	</head>
 
 	<body onload="get_data()">
 		<nav class="navbar navbar-default navbar-fixed-top">
-			<div class="container-fluid">			
-				<ul class="nav navbar-nav">
-					<li class="">
-						<a href="user_page.php">Статистика</a>
-					</li>
-					<li class="active">
-						<a href="#">Настройки</a>
-					</li>
-				</ul>
+			<div class="container-fluid">	
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" 
+						data-toggle="collapse" data-target="#collapsable-navbar" aria-expanded="false">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="user_page.php">Healthy air</a>
+				</div>		
+
+				<div class="collapse navbar-collapse" id="collapsable-navbar">
+					<ul class="nav navbar-nav">
+						<li class="">
+							<a href="user_page.php">Статистика</a>
+						</li>
+
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" 
+								role="button" aria-haspopup="true" 
+								aria-expanded="false">
+								Настройки<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="#">
+										Общие настройки
+									</a>
+								</li>
+								<li>
+									<a href="add_category.php">	
+										Добавление категорий
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>	
 			</div>
 		</nav>
+
 
 		<div class="container-fluid" style="margin-top: 3%">
 
@@ -149,22 +240,22 @@
 							id="alerts" style="display:none;"></div>
 						<div class="alert alert-warning" id="no_stations" 
 							role="alert" style="display:none;">
-							You have no registered meteostations at the moment
+							У вас ещё нет зарегистрированных метеостанций
 						</div>
 
 						<div class="list-group" id="stations" 
 							style="display:none; margin-top: 3%"></div>
 
-						<label for="name">Station name</label>
-			            <input type="text" class="form-control" id="name" placeholder="Station name">
+						<label for="name">Название метеостанции:</label>
+			            <input type="text" class="form-control" id="name" placeholder="Название метеостанции">
 
 		                <div class="row" style="margin-top:3%">
-				            <div class="col-lg-offset-3 col-lg-4 col-md-offset-1 col-md-4
+				            <div class="col-lg-offset-3 col-lg-4 col-md-offset-3 col-md-4
 				            			col-sm-offset-3 col-sm-4 col-xs-offset-3 col-xs-4">
 								<button type="button" name="submit" class="btn btn-success btn-lg" 
-				                		onclick="try_add_station()">Add station</button>
+				                		onclick="try_add_station()">Добавить</button>
 			                </div>
-		                </div>
+		                </div>>
 					</div>
 				</div>
 
@@ -174,6 +265,8 @@
 							<div id="categories" class="col-lg-12">
 							</div>
 						</div>
+
+						
 					</div>
 				</div>
 
