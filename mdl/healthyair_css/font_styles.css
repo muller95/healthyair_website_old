@@ -1,0 +1,16 @@
+/*@import url("gregor/gregor.css");
+@import url("droidserif/droidserif.css");*/
+
+@font-face {
+    font-family: 'Gregor';
+    src: local('Gregor'), url('gregor.woff2') format('woff2'), 
+    	url('gregor.woff') format('woff'), 
+    	url('gregor.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+.healthyair_font {
+	font-family: "Arial";
+}
