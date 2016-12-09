@@ -42,6 +42,31 @@
                 window.location.href = "user_page.php";
           });
     }
+
+    function try_get_stations() {
+        /*var stations = document.getElementById("stations");
+        var no_stations = document.getElementById("no_stations");
+          
+        stations.style.display = "none";
+        no_stations.style.display = "none";*/
+
+          $.get("try_get_stations.php",  
+            function(data) {
+                  if (data == "NO STATIONS") {
+                    //no_stations.style.display = "";
+                  }
+                  else {
+                    //stations.style.display = ""; 
+                    //stations.innerHTML = data;
+
+                    /*var stations_btns = document.getElementById('stations').children;
+                    if (stname == null)
+                      set_station(stations_btns[0].name);
+                    else
+                      set_station(stname);*/
+                  }
+                });
+        }
   </script>
 
   </head>

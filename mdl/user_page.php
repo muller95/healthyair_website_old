@@ -24,13 +24,18 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="jquery-3.1.0.min.js"></script>
 
-  <script type="text/javascript">
-  </script>
+    <script type="text/javascript">
+        function logout() {
+          $.post("logout.php",
+            function () {
+              window.location.href = "index.php";
+            });
+        }
+    </script>
 
   </head>
 
   <body>
-
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -40,10 +45,58 @@
           <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->
           <nav class="mdl-navigation">
-            <label> Привет, <?php echo $_SESSION["user_name"]; ?></label>
-            <a class="mdl-navigation__link" href="">Выйти</a>
+            <a class="mdl-navigation__link" href="" 
+                onclick="logout()">Выйти</a>
           </nav>
         </div>
       </header>
+
+      <!-- Meteostations card -->
+      <div class="mdl-card mdl-cell mdl-cell--2-col mdl-cell--6-col-tablet 
+         mdl-cell--1-offset-tablet
+         mdl-shadow--2dp mdl-card--border">
+        <div class="mdl-card__title healthyair_font" 
+          style="background:#219e21; font-size:20pt;
+            color:#FAFAFA">
+          Мои метеостанции
+        </div>
+      
+        
+        <div class="mdl-card__actions mdl-card--border">
+          <ul class="mdl-list" id="error_list" style="display: none">
+          </ul>
+          <!-- User email -->
+          <div class="mdl-textfield mdl-js-textfield 
+            mdl-textfield--floating-label" style="width:100%">
+            <input class="mdl-textfield__input" type="text" id="email">
+            <label class="mdl-textfield__label" for="email">Email</label>
+          </div>
+
+           <!-- Password -->
+          <div class="mdl-textfield mdl-js-textfield 
+            mdl-textfield--floating-label" style="width:100%">
+            <input class="mdl-textfield__input" type="password" id="passwd">
+            <label class="mdl-textfield__label" for="email">Password</label>
+          </div>
+
+          <!-- Remember me checkbox -->
+          <label class="mdl-checkbox mdl-js-checkbox 
+            mdl-js-ripple-effect" for="remember">
+            <input type="checkbox" id="remember" class="mdl-checkbox__input">
+            <span class="mdl-checkbox__label">Запомнить меня</span>
+          </label>
+
+          <!-- Log-in and redirect to reigistration buttons -->
+          <button class="mdl-button  mdl-button--colored mdl-js-button 
+            mdl-button--raised" style="width:100%" onclick="try_login()">
+            <label class="healthyair_font"  style="color:#FAFAFA">Войти</label>
+          </button>
+          <button class="mdl-button mdl-button--raised mdl-js-button 
+            mdl-js-ripple-effect" style="width:100%; margin-top:2%">
+            <a href="register.php" class="mdl-button">Зарегистрироваться</a>
+          </button>
+
+        </div>
+      </div>
   </body>
 </html>

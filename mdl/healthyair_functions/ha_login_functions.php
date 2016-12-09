@@ -16,10 +16,13 @@
 			$_SESSION["login"] = $_COOKIE["login"];
 			$_SESSION["email"] = $_COOKIE["email"];
 			$_SESSION["user_name"] = $_COOKIE["user_name"];
+			$_SESSION["user_id"] = $_COOKIE["user_id"];
 
 			setcookie("login", $_COOKIE["login"], time() + 3 * 24 * 60 * 60);
 			setcookie("email", $_COOKIE["email"], time() + 3 * 24 * 60 * 60);
 			setcookie("user_name", $_COOKIE["user_name"], 
+				time() + 3 * 24 * 60 * 60);
+			setcookie("user_id", $_COOKIE["user_id"], 
 				time() + 3 * 24 * 60 * 60);
 			return true;
 		}

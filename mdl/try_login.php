@@ -49,8 +49,6 @@
 				$_SESSION["login"] = $login_hash;
 				setcookie("login", $login_hash, time() + 3 * 24 * 60 * 60);
 				setcookie("email", $email, time() + 3 * 24 * 60 * 60);
-
-				echo $_COOKIE["user_name"];
 			}
 			echo "OK";
 		}
