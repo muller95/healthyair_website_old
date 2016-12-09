@@ -43,35 +43,12 @@
           });
     }
 
-    function try_get_stations() {
-        /*var stations = document.getElementById("stations");
-        var no_stations = document.getElementById("no_stations");
-          
-        stations.style.display = "none";
-        no_stations.style.display = "none";*/
 
-          $.get("try_get_stations.php",  
-            function(data) {
-                  if (data == "NO STATIONS") {
-                    //no_stations.style.display = "";
-                  }
-                  else {
-                    //stations.style.display = ""; 
-                    //stations.innerHTML = data;
-
-                    /*var stations_btns = document.getElementById('stations').children;
-                    if (stname == null)
-                      set_station(stations_btns[0].name);
-                    else
-                      set_station(stname);*/
-                  }
-                });
-        }
   </script>
 
   </head>
 
-  <body>
+  <body onload="try_get_stations()">
       <!-- Authorization card -->
       <div class="mdl-card mdl-cell mdl-cell--4-offset-desktop 
         mdl-cell--4-col mdl-cell--6-col-tablet mdl-cell--1-offset-tablet
@@ -97,7 +74,7 @@
           <div class="mdl-textfield mdl-js-textfield 
             mdl-textfield--floating-label" style="width:100%">
             <input class="mdl-textfield__input" type="password" id="passwd">
-            <label class="mdl-textfield__label" for="email">Password</label>
+            <label class="mdl-textfield__label" for="passwd">Password</label>
           </div>
 
           <!-- Remember me checkbox -->

@@ -3,6 +3,8 @@
   require_once('healthyair_functions/ha_login_functions.php');
   if (!ha_validate_login())
     header('Location: index.php');
+
+  $_SESSION["form_secret"] = rand(0, 1000);
 ?>
 
 <!DOCTYPE html>
@@ -27,15 +29,81 @@
     <script type="text/javascript">
         function logout() {
           $.post("logout.php",
-            function () {
+            function (data) {
               window.location.href = "index.php";
             });
         }
+
+        function try_get_stations() {
+          var stations = document.getElementById("stations");
+          /*var no_stations = document.getElementById("no_stations");
+          
+            stations.style.display = "none";
+            no_stations.style.display = "none";*/
+
+          $.get("try_get_stations.php",  
+            function(data) {
+            
+            if (data == "NO STATIONS"){
+              no_stations.style.display = "";
+            }
+            else {
+              stations.innerHTML = data;
+
+/*              var stations_btns = document.getElementById('stations').children;
+                if (stname == null)
+                  set_station(stations_btns[0].name);
+                else
+                  set_station(stname);*/
+              }
+            });
+        }
+
+        function delete_station(station_id) {
+          var error_list = document.getElementById("error_list");
+          var form_secret = document.getElementById("form_secret").value;
+          
+          error_list.style.display = 'none';
+          $.post("delete_station.php", { station_id: station_id,
+            form_secret: form_secret },
+            function (data) {
+              if (data != "OK") {
+                error_list.style.display = '';
+                error_list.innerHTML = data;
+              }
+
+              try_get_stations();
+            });
+        }
+
+        function try_add_station() {
+          var error_list = document.getElementById("error_list");
+          var station_textbox = document.getElementById("station_name");
+          var station_name = station_textbox.value;
+          var form_secret = document.getElementById("form_secret").value;
+          
+          error_list.style.display = 'none';
+          
+          $.post("try_add_station.php", { station_name: station_name, 
+            form_secret: form_secret },  
+            function(data) {
+
+              if (data != "OK") {
+                error_list.style.display = "";
+                error_list.innerHTML = data;
+              } else
+                station_textbox.value = "";
+
+              try_get_stations();
+            });
+        } 
+
+
     </script>
 
   </head>
 
-  <body>
+  <body onload="try_get_stations()"> 
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -50,53 +118,53 @@
           </nav>
         </div>
       </header>
+    </div>
 
-      <!-- Meteostations card -->
-      <div class="mdl-card mdl-cell mdl-cell--2-col mdl-cell--6-col-tablet 
-         mdl-cell--1-offset-tablet
-         mdl-shadow--2dp mdl-card--border">
-        <div class="mdl-card__title healthyair_font" 
-          style="background:#219e21; font-size:20pt;
-            color:#FAFAFA">
-          Мои метеостанции
-        </div>
-      
-        
-        <div class="mdl-card__actions mdl-card--border">
-          <ul class="mdl-list" id="error_list" style="display: none">
-          </ul>
-          <!-- User email -->
-          <div class="mdl-textfield mdl-js-textfield 
-            mdl-textfield--floating-label" style="width:100%">
-            <input class="mdl-textfield__input" type="text" id="email">
-            <label class="mdl-textfield__label" for="email">Email</label>
+    <main class="mdl-layout__content">
+      <div class="page-content">   
+        <div class="mdl-grid">
+          <!-- Meteostations card -->
+          <div class="mdl-card mdl-cell mdl-cell--3-col mdl-cell--6-col-tablet 
+             mdl-cell--1-offset-tablet mdl-shadow--2dp mdl-card--border"
+             style="min-width: 325px">
+            <div class="mdl-card__title healthyair_font" 
+              style="background:#219e21; font-size:20pt;
+                color:#FAFAFA">
+              Мои метеостанции
+            </div>
+            <!--Adding station-->
+            <div class="mdl-card__actions mdl-card--border">
+              <ul class="mdl-list" id="error_list" style="display: none">
+              </ul>
+              <div style="max-height: 350px; overflow: auto;">
+                <table class="mdl-data-table mdl-js-data-table" id="stations"
+                  style="width: 100%;">
+                </table>
+              </div>
+              <div class="mdl-textfield mdl-js-textfield 
+                mdl-textfield--floating-label" style="width:100%">
+                <input class="mdl-textfield__input" type="text" id="station_name">
+                <label class="mdl-textfield__label" for="station_name">
+                  Название метеостанции
+                </label>          
+              </div>
+              <small>
+                Название метеостанции должно быть не длиннее 10 символов.
+              </small>
+              <button class="mdl-button  mdl-button--colored mdl-js-button 
+                mdl-button--raised" style="width:100%" onclick="try_add_station()">
+                <label class="healthyair_font"  style="color:#FAFAFA">
+                  Добавить метеостанцию
+                </label>
+              </button>
+            </div>
           </div>
-
-           <!-- Password -->
-          <div class="mdl-textfield mdl-js-textfield 
-            mdl-textfield--floating-label" style="width:100%">
-            <input class="mdl-textfield__input" type="password" id="passwd">
-            <label class="mdl-textfield__label" for="email">Password</label>
-          </div>
-
-          <!-- Remember me checkbox -->
-          <label class="mdl-checkbox mdl-js-checkbox 
-            mdl-js-ripple-effect" for="remember">
-            <input type="checkbox" id="remember" class="mdl-checkbox__input">
-            <span class="mdl-checkbox__label">Запомнить меня</span>
-          </label>
-
-          <!-- Log-in and redirect to reigistration buttons -->
-          <button class="mdl-button  mdl-button--colored mdl-js-button 
-            mdl-button--raised" style="width:100%" onclick="try_login()">
-            <label class="healthyair_font"  style="color:#FAFAFA">Войти</label>
-          </button>
-          <button class="mdl-button mdl-button--raised mdl-js-button 
-            mdl-js-ripple-effect" style="width:100%; margin-top:2%">
-            <a href="register.php" class="mdl-button">Зарегистрироваться</a>
-          </button>
-
+          <!-- Meteostations card end -->
         </div>
       </div>
+    </main>
+
+    <input type="hidden" id="form_secret" 
+      value="<?php echo $_SESSION["form_secret"]?>">
   </body>
 </html>

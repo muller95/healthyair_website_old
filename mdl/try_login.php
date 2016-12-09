@@ -37,16 +37,17 @@
 		}
 
 		if (!$error) {
+			$row = $result->fetch_array();
+			$_SESSION["user_id"] = $row["id"];
+			$_SESSION["user_name"] = $row["user_name"];
+			$login_hash = ha_generate_login_hash($email);
+			$_SESSION["login"] = $login_hash;
+			$_SESSION["email"] = $email;
+
 			if ($remember == "true") {
-				$row = $result->fetch_array();
-				$_SESSION["user_id"] = $row["id"];
 				setcookie("user_id", $row["id"], time() + 3 * 24 * 60 * 60);
 				setcookie("user_name", $row["user_name"], 
 					time() + 3 * 24 * 60 * 60);
-				$_SESSION["user_name"] = $row["user_name"];
-
-				$login_hash = ha_generate_login_hash($email);
-				$_SESSION["login"] = $login_hash;
 				setcookie("login", $login_hash, time() + 3 * 24 * 60 * 60);
 				setcookie("email", $email, time() + 3 * 24 * 60 * 60);
 			}

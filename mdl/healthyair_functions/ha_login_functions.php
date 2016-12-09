@@ -6,10 +6,10 @@
 	}
 
 	function ha_validate_login() {
-
 		if (isset($_SESSION["login"]) && $_SESSION["login"] == 
 			ha_generate_login_hash($_SESSION["email"]))
 			return true;
+
 
 		if (isset($_COOKIE["login"]) && $_COOKIE["login"] == 
 			ha_generate_login_hash($_COOKIE["email"])) {

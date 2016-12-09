@@ -1,16 +1,16 @@
 <?php
 	class ha_web_control {
-		var $tag, $properties, $inner_controls, $text;
+		var $tag, $properties, $inner_controls, $text, $n_inner_controls;
 		function ha_web_control($tag) {
 			$this->tag = $tag;
-			$inner_controls = array();
-			$properties = array();
+			$this->inner_controls = array();
+			$this->n_inner_controls = 0;
+			$this->properties = array();
 			$this->text = "";
 		}	
 
 		function insert_control($control) {
-			$count = count($inner_controls);
-			$this->inner_controls[$count] = $control;
+			$this->inner_controls[$this->n_inner_controls++] = $control;
 		}
 
 		function set_property($property_name, $property_val) {
@@ -24,6 +24,7 @@
 		function print() {
 			printf("<%s ", $this->tag);
 
+			
 			foreach ($this->properties as $property => $value)
     			printf('%s="%s" ', $property, $value);
 
