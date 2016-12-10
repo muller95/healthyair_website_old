@@ -36,16 +36,14 @@
 
         function try_get_stations() {
           var stations = document.getElementById("stations");
-          /*var no_stations = document.getElementById("no_stations");
-          
-            stations.style.display = "none";
-            no_stations.style.display = "none";*/
+          var warn_list = document.getElementById("warn_list");
+          var form_secret = document.getElementById("form_secret").value;
 
-          $.get("try_get_stations.php",  
+          $.post("try_get_stations.php", { form_secret: form_secret },
             function(data) {
-            
             if (data == "NO STATIONS"){
-              no_stations.style.display = "";
+              warn_list.style.display = "";
+              stations.innerHTML = "";
             }
             else {
               stations.innerHTML = data;
@@ -87,7 +85,6 @@
           $.post("try_add_station.php", { station_name: station_name, 
             form_secret: form_secret },  
             function(data) {
-
               if (data != "OK") {
                 error_list.style.display = "";
                 error_list.innerHTML = data;
@@ -103,7 +100,7 @@
 
   </head>
 
-  <body onload="try_get_stations()"> 
+  <body onload="try_get_stations()" style="background-color: #EAEAEA"> 
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -118,51 +115,82 @@
           </nav>
         </div>
       </header>
-    </div>
+    
 
-    <main class="mdl-layout__content">
-      <div class="page-content">   
-        <div class="mdl-grid">
-          <!-- Meteostations card -->
-          <div class="mdl-card mdl-cell mdl-cell--3-col mdl-cell--6-col-tablet 
-             mdl-cell--1-offset-tablet mdl-shadow--2dp mdl-card--border"
-             style="min-width: 325px">
-            <div class="mdl-card__title healthyair_font" 
-              style="background:#219e21; font-size:20pt;
-                color:#FAFAFA">
-              Мои метеостанции
+      <main class="mdl-layout__content">
+        <div class="page-content">   
+          <div class="mdl-grid">
+            <!-- Meteostations card -->
+            <div class="mdl-card mdl-cell mdl-cell--3-col mdl-cell--6-col-tablet 
+               mdl-cell--1-offset-tablet mdl-shadow--2dp mdl-card--border
+                mdl-cell--4-col-phone"">
+              <div class="mdl-card__title healthyair_font" 
+                style="background:rgb(33, 158, 33); font-size:20pt;
+                  color:#FAFAFA">
+                Мои метеостанции
+              </div>
+              <!--Adding station-->
+              <div class="mdl-card__actions mdl-card--border">
+                <!-- No station warn -->
+                <ul class="mdl-list" id="warn_list" style="display: none">
+                  <li class="mdl-list__item">
+                    <span class="mdl-list__item-primary-content">
+                      <i class="material-icons" 
+                        style="color: rgb(247, 226, 34)">
+                        warning
+                      </i>
+                      Вы ещё не добавили ни одной метеостанции.
+                    </span>
+                  </li>
+                </ul>
+                <!--Adding station errors -->
+                <ul class="mdl-list" id="error_list" style="display: none">
+                </ul>
+                <div style="max-height: 350px; overflow: auto;">
+                  <table class="mdl-data-table mdl-js-data-table" id="stations"
+                    style="width: 100%;">
+                  </table>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield 
+                  mdl-textfield--floating-label" style="width:100%">
+                  <input class="mdl-textfield__input" type="text" id="station_name">
+                  <label class="mdl-textfield__label" for="station_name">
+                    Название метеостанции
+                  </label>          
+                </div>
+                <small>
+                  Название метеостанции должно быть не длиннее 10 символов.
+                </small>
+                <button class="mdl-button  mdl-button--colored mdl-js-button 
+                  mdl-button--raised" style="width:100%" onclick="try_add_station()">
+                  <label class="healthyair_font"  style="color:#FAFAFA">
+                    Добавить метеостанцию
+                  </label>
+                </button>
+              </div>
             </div>
-            <!--Adding station-->
-            <div class="mdl-card__actions mdl-card--border">
-              <ul class="mdl-list" id="error_list" style="display: none">
-              </ul>
-              <div style="max-height: 350px; overflow: auto;">
-                <table class="mdl-data-table mdl-js-data-table" id="stations"
-                  style="width: 100%;">
-                </table>
+            <!-- Meteostations card end -->
+
+            <!--Statistics card-->
+            <div class="mdl-card mdl-cell mdl-cell--9-col mdl-cell--6-col-tablet 
+               mdl-cell--1-offset-tablet mdl-shadow--2dp mdl-card--border">
+               <div class="mdl-card__title healthyair_font" 
+                style="background: rgb(33, 158, 33); font-size:20pt;
+                  color:#FAFAFA">
+                Статистика
               </div>
-              <div class="mdl-textfield mdl-js-textfield 
-                mdl-textfield--floating-label" style="width:100%">
-                <input class="mdl-textfield__input" type="text" id="station_name">
-                <label class="mdl-textfield__label" for="station_name">
-                  Название метеостанции
-                </label>          
+
+              <!--Statistics card actions -->
+              <div class="mdl-card__actions mdl-card--border">
+                <div class="mdl-grid">
+
+                </div>
               </div>
-              <small>
-                Название метеостанции должно быть не длиннее 10 символов.
-              </small>
-              <button class="mdl-button  mdl-button--colored mdl-js-button 
-                mdl-button--raised" style="width:100%" onclick="try_add_station()">
-                <label class="healthyair_font"  style="color:#FAFAFA">
-                  Добавить метеостанцию
-                </label>
-              </button>
             </div>
           </div>
-          <!-- Meteostations card end -->
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
 
     <input type="hidden" id="form_secret" 
       value="<?php echo $_SESSION["form_secret"]?>">

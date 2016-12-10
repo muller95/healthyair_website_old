@@ -3,6 +3,9 @@
 	require_once("healthyair_functions/ha_print_error.php");
 	require_once("healthyair_functions/ha_login_functions.php");
 
+	if ($_POST["form_secret"] != $_SESSION["form_secret"])
+		exit(0);
+
 	$email = $_POST["email"];
 	$passwd = $_POST["passwd"];
 	$remember = $_POST["remember"];

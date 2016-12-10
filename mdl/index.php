@@ -30,16 +30,18 @@
       var email = document.getElementById("email").value;
       var passwd = document.getElementById("passwd").value;
       var remember = document.getElementById("remember").checked;
+      var form_secret = document.getElementById("form_secret").value;
 
       error_list.style.display = 'none';
       $.post("try_login.php", { email: email, passwd: passwd, 
-          remember: remember},  
+          remember: remember, form_secret: form_secret },  
           function(data) {
-            if (data != "OK") {
+            if (data != "OK" && data != "") {
               error_list.style.display = '';
               error_list.innerHTML = data;
-            } else
-                window.location.href = "user_page.php";
+            } else if (data == "OK") {
+              window.location.href = "user_page.php";
+            }
           });
     }
 
@@ -93,8 +95,10 @@
             mdl-js-ripple-effect" style="width:100%; margin-top:2%">
             <a href="register.php" class="mdl-button">Зарегистрироваться</a>
           </button>
-
         </div>
       </div>
+
+      <input type="hidden" id="form_secret" 
+        value="<?php echo $_SESSION["form_secret"]?>">
   </body>
 </html>

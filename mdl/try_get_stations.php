@@ -3,6 +3,9 @@
 	require_once("healthyair_functions/ha_print_error.php");
 	require_once("healthyair_classes/ha_web_control.php");
 
+	if ($_POST["form_secret"] != $_SESSION["form_secret"])
+		exit(0);
+
 	$query = sprintf("SELECT * FROM stations WHERE user_id=%d", 
 		$_SESSION['user_id']);
 
