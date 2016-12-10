@@ -18,11 +18,6 @@
 	if ($result->num_rows == 0)
 		echo "NO STATIONS";
 	else {
-	/*	$table = new ha_web_control("table");
-		$table->set_property("class", 
-			"mdl-data-table mdl-js-data-table");
-		$table->set_property("style", "width:100%");*/
-
 		$body = new ha_web_control("tbody");
 
 		while (($row = $result->fetch_array())) {
@@ -37,13 +32,16 @@
 			$label = new ha_web_control("label");
 			$label->set_property("class", 
 				"mdl-radio mdl-js-radio mdl-js-ripple-effect");
-			$label->set_property("for", $id);
+			$label->set_property("for", "station_" . $id);
 
 			$radio = new ha_web_control("input");
 			$radio->set_property("type", "radio");
-			$radio->set_property("id", $id);
+			$radio->set_property("value", $id);
+			$radio->set_property("id", "station_" . $id);
 			$radio->set_property("class", "mdl-radio__button");
-			$radio->set_property("name", "selected_station");
+			$radio->set_property("name", "station_radios");
+			$radio->set_property("onclick", "set_station_id(this)");
+
 
 			$span = new ha_web_control("span");
 			$span->set_property("class", "mdl-radio__label");
@@ -73,7 +71,5 @@
 		}
 
 		$body->print();
-/*		$table->insert_control($body);
-		$table->print();*/
 	}
 ?>
