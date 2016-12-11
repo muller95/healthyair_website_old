@@ -28,6 +28,8 @@
 			$table_cell = new ha_web_control("td");
 			$table_cell->set_property("class", 
 				"mdl-data-table__cell--non-numeric");
+			$table_cell->set_property("style", "width: 1px; 
+				white-space: nowrap;");
 
 			$label = new ha_web_control("label");
 			$label->set_property("class", 

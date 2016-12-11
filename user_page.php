@@ -29,6 +29,7 @@
       src="https://www.gstatic.com/charts/loader.js"></script>
 
     <script type="text/javascript">
+      var meas_num = 0;
       var station_id = null;
       var initiated = false;
 
@@ -76,11 +77,13 @@
                     redTo:t_highest};
 
         rh_gauge_desktop = new google.visualization.Gauge(document.getElementById('rh_gauge_desktop'));
+        rh_gauge_mobile = new google.visualization.Gauge(document.getElementById('rh_gauge_mobile'));
         rh_gauge_options = {minorTicks:5, greenFrom:rh_lowest, greenTo:rh_mid,
                     yellowFrom:rh_mid, yellowTo:rh_high, redFrom:rh_high,
                     redTo:rh_highest};
 
         co2_gauge_desktop = new google.visualization.Gauge(document.getElementById('co2_gauge_desktop'));
+        co2_gauge_mobile = new google.visualization.Gauge(document.getElementById('co2_gauge_mobile'));
         co2_gauge_options = {minorTicks:5, max:10000, greenFrom:co2_lowest, greenTo:co2_mid,
                     yellowFrom:co2_mid, yellowTo:co2_high, redFrom:co2_high,
                     redTo:co2_highest};
@@ -153,10 +156,12 @@
                 var rh_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
                 ['RH', rh]]);
                 rh_gauge_desktop.draw(rh_gauge_data, rh_gauge_options);
+                rh_gauge_mobile.draw(rh_gauge_data, rh_gauge_options);
           
                 var co2_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
                 ['CO2', co2]]);
                 co2_gauge_desktop.draw(co2_gauge_data, co2_gauge_options);
+                co2_gauge_mobile.draw(co2_gauge_data, co2_gauge_options);
         });
       }
 
@@ -265,6 +270,13 @@
           var meas_type = graphic_button.id.substring(0, index);
           var controls = document.getElementById("button_gauges").children;
 
+          if (meas_type == "temp")
+            meas_num = 0;
+          else if (meas_type == "rh")
+            meas_num = 1;
+          else
+            meas_num = 2;
+
           for (var i = 0; i < controls.length; i++) {
             var id = controls[i].id;
             
@@ -276,7 +288,17 @@
           }
 
           controls = document.getElementById("graphics").children;
+          for (var i = 0; i < controls.length; i++) {
+            var id = controls[i].id;
+            
+            index = id.indexOf("_");            
+            if (id.substring(0, index) == meas_type)
+              controls[i].style.display = "";
+            else 
+              controls[i].style.display = "none";
+          }
 
+          controls = document.getElementById("mobile_gauges").children;
           for (var i = 0; i < controls.length; i++) {
             var id = controls[i].id;
             
@@ -288,15 +310,52 @@
           }
         }
 
-        $(document).ready(function() {
-          $("#slide_left").click(function() {
-            alert("left.");
-          });
+        function set_graphic_mobile(slide_button) {
+          var controls, meas_type;
+          var types = [ "temp", "rh", "co2" ];
+          var index = slide_button.id.indexOf("_");
 
-          $("#slide_right").click(function() {
-            alert("right.");
-          });
-        });
+
+          if (slide_button.id.substring(index + 1) == "up")
+            meas_num = (--meas_num >= 0) ? meas_num : 2;
+          else
+            meas_num = ++meas_num % 3;
+
+          meas_type = types[meas_num];
+
+          controls = document.getElementById("button_gauges").children;
+          for (var i = 0; i < controls.length; i++) {
+            var id = controls[i].id;
+            
+            index = id.indexOf("_");
+            if (id.substring(0, index) == meas_type)
+              controls[i].style.backgroundColor = "rgba(33, 158, 33, 0.5)";
+            else 
+              controls[i].style.backgroundColor = "rgba(0, 0,0, 0)";
+          }
+
+          controls = document.getElementById("graphics").children;
+          for (var i = 0; i < controls.length; i++) {
+            var id = controls[i].id;
+            
+            index = id.indexOf("_");            
+            if (id.substring(0, index) == meas_type)
+              controls[i].style.display = "";
+            else 
+              controls[i].style.display = "none";
+          }
+
+          controls = document.getElementById("mobile_gauges").children;
+          for (var i = 0; i < controls.length; i++) {
+            var id = controls[i].id;
+            
+            index = id.indexOf("_");            
+            if (id.substring(0, index) == meas_type)
+              controls[i].style.display = "";
+            else 
+              controls[i].style.display = "none";
+          }
+        }
 
     </script>
 
@@ -322,7 +381,7 @@
       <main class="mdl-layout__content">
         <!-- Meteostations card -->
         <div class="mdl-card mdl-cell mdl-cell--3-col mdl-cell--6-col-tablet 
-          mdl-cell--1-offset-tablet mdl-shadow--2dp mdl-card--border
+          mdl-cell--8-col-tablet mdl-shadow--2dp mdl-card--border
           mdl-cell--4-col-phone" style="float: left;">
           <div class="mdl-card__title healthyair_font" 
             style="background:rgb(33, 158, 33); font-size:20pt;
@@ -372,8 +431,8 @@
         <!-- Meteostations card end -->
 
         <!--Statistics card-->
-        <div class="mdl-card mdl-cell mdl-cell--9-col mdl-cell--6-col-tablet 
-          mdl-cell--1-offset-tablet mdl-shadow--2dp mdl-card--border">
+        <div class="mdl-card mdl-cell mdl-cell--9-col mdl-cell--8-col-tablet 
+          mdl-cell--4-col-phone mdl-shadow--2dp mdl-card--border">
           <div class="mdl-card__title healthyair_font" 
             style="background: rgb(33, 158, 33); font-size:20pt;
             color:#FAFAFA">
@@ -384,7 +443,8 @@
           <div class="mdl-card__actions mdl-card--border mdl-grid">           
             <!--Desktop Gauges-->
             <div class="mdl-cell mdl-cell--12-col mdl-cell--hide-tablet 
-              mdl-cell--hide-phone" id="button_gauges" style="display: flex; justify-content: center;">
+              mdl-cell--hide-phone" id="button_gauges" 
+                style="display: flex; justify-content: center;">
               <button class="
                 mdl-button mdl-js-button mdl-js-ripple-effect" id="temp_button"
                 onclick="set_graphic_desktop(this)"
@@ -410,26 +470,27 @@
             </div>
 
             <!-- Tablet and mobile gauges -->
-            <div class="mdl-cell mdl-cell--12-col mdl-cell--hide-desktop mdl-grid" style="height:200px;">
-              <button class="mdl-cell mdl-cell--1-col
-                mdl-button mdl-js-button mdl-button--fab" id="slide_left"
-                style="margin-top: 80px">
-                <i class="material-icons">keyboard_arrow_left</i>
+            <div class="mdl-cell mdl-cell--12-col mdl-cell--hide-desktop">
+              <button class="mdl-cell mdl-cell--12-col
+                mdl-button mdl-js-button mdl-button--raised" id="slide_up"
+                onclick="set_graphic_mobile(this)">
+                <i class="material-icons">keyboard_arrow_up</i>
               </button>
+                <center>
+                <div class="mdl-cell mdl-cell-12-col" id="mobile_gauges">
+                  <div id="temp_gauge_mobile" 
+                    style="min-width:200px;"></div>
+                  <div id="rh_gauge_mobile"
+                    style="min-width:200px; display: none;"></div>
+                  <div id="co2_gauge_mobile"
+                    style="min-width:200px; display: none;"></div>
+                </div>
+              </center>
 
-              <div class="mdl-cell" id="mobile_gauges" style=" height:200px; width:200px; background: #FF0000">
-                <div id="temp_gauge_mobile" 
-                  style="min-width:200px;"></div>
-                <div id="rh_gauge_mobile"
-                  style="min-width:200px;"></div>
-                <div id="co2_gauge_mobile"
-                  style="min-width:200px;%"></div>
-              </div>
-
-              <button class="mdl-cell mdl-cell--1-col
-                mdl-button mdl-js-button mdl-button--fab" id="slide_right"
-                style="margin-top: 80px">
-                <i class="material-icons">keyboard_arrow_right</i>
+              <button class="mdl-cell mdl-cell--12-col
+                mdl-button mdl-js-button mdl-button--raised" id="slide_down"
+                onclick="set_graphic_mobile(this)">
+                <i class="material-icons">keyboard_arrow_down</i>
               </button>
             </div>
             
