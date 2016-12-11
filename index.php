@@ -1,6 +1,7 @@
 <?php
   require_once('system_inits.php'); 
-  if (isset($_SESSION['uid']))
+  require_once('healthyair_functions/ha_login_functions.php');
+  if (ha_validate_login())
     header('Location: user_page.php');
 ?>
 
@@ -11,84 +12,93 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
 
-    <title>Login</title>
+    <title>Вход</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="jumbotron.css" rel="stylesheet">
-
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="js/ie-emulation-modes-warning.js"></script>
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
+    <link rel="stylesheet" href="mdl/material.css">
+    <link rel="stylesheet" href="healthyair_css/font_styles.css">
+    <script src="mdl/material.min.js"></script>
+    <link rel="stylesheet" 
+      href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="jquery-3.1.0.min.js"></script>
 
   <script type="text/javascript">
     function try_login() {
-      var alerts = document.getElementById("alerts");
-      var login_email = document.forms["login_form"]["email"].value;
-      var login_passwd = document.forms["login_form"]["passwd"].value;
-             
-      alerts.innerHTML = "";
-      alerts.style.display = "none";
+      var error_list = document.getElementById("error_list");
+      var email = document.getElementById("email").value;
+      var passwd = document.getElementById("passwd").value;
+      var remember = document.getElementById("remember").checked;
+      var form_secret = document.getElementById("form_secret").value;
 
-      $.post("try_login.php", { email:login_email, passwd:login_passwd},  
+      error_list.style.display = 'none';
+      $.post("try_login.php", { email: email, passwd: passwd, 
+          remember: remember, form_secret: form_secret },  
           function(data) {
-            if (data != "OK") {
-              alerts.style.display = "";
-              alerts.innerHTML = data;
-            } else 
-                window.location.href = "user_page.php";
+            if (data != "OK" && data != "") {
+              error_list.style.display = '';
+              error_list.innerHTML = data;
+            } else if (data == "OK") {
+              window.location.href = "user_page.php";
+            }
           });
     }
+
+
   </script>
 
   </head>
 
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-5 col-lg-offset-3 col-md-6 col-md-offset-4 col-sm-8 col-sm-offset-3 col-xs-12">
+  <body onload="try_get_stations()">
+      <!-- Authorization card -->
+      <div class="mdl-card mdl-cell mdl-cell--4-offset-desktop 
+        mdl-cell--4-col mdl-cell--6-col-tablet mdl-cell--1-offset-tablet
+         mdl-shadow--2dp mdl-card--border">
+        <div class="mdl-card__title healthyair_font" 
+          style="background:#219e21; font-size:20pt;
+            color:#FAFAFA">
+          Авторизация
+        </div>
+      
+        
+        <div class="mdl-card__actions mdl-card--border">
+          <ul class="mdl-list" id="error_list" style="display: none">
+          </ul>
+          <!-- User email -->
+          <div class="mdl-textfield mdl-js-textfield 
+            mdl-textfield--floating-label" style="width:100%">
+            <input class="mdl-textfield__input" type="text" id="email">
+            <label class="mdl-textfield__label" for="email">Email</label>
+          </div>
 
-          <form name="login_form">
+           <!-- Password -->
+          <div class="mdl-textfield mdl-js-textfield 
+            mdl-textfield--floating-label" style="width:100%">
+            <input class="mdl-textfield__input" type="password" id="passwd">
+            <label class="mdl-textfield__label" for="passwd">Password</label>
+          </div>
 
-            <div class="jumbotron">
-              <div class="alert alert-danger" role="alert" id="alerts" style="display:none;"></div>
+          <!-- Remember me checkbox -->
+          <label class="mdl-checkbox mdl-js-checkbox 
+            mdl-js-ripple-effect" for="remember">
+            <input type="checkbox" id="remember" class="mdl-checkbox__input">
+            <span class="mdl-checkbox__label">Запомнить меня</span>
+          </label>
 
-              <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="Email">
-              <label for="passwd">Пароль</label>
-              <input type="password" class="form-control" id="passwd" placeholder="Пароль">
-
-              <div class="row" style="margin-top:10%">
-                <div class="col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-3">
-                    <button type="button" name="submit" class="btn btn-success btn-lg" onclick="try_login()">Войти</button>
-                    <a class="btn btn-primary btn-lg" href="register.php" role="button">Зарегистрироваться</a>
-                </div>
-              </div>
-
-            </div>
-
-          </form>
-
+          <!-- Log-in and redirect to reigistration buttons -->
+          <button class="mdl-button  mdl-button--colored mdl-js-button 
+            mdl-button--raised" style="width:100%" onclick="try_login()">
+            <label class="healthyair_font"  style="color:#FAFAFA">Войти</label>
+          </button>
+          <button class="mdl-button mdl-button--raised mdl-js-button 
+            mdl-js-ripple-effect" style="width:100%; margin-top:2%">
+            <a href="register.php" class="mdl-button">Зарегистрироваться</a>
+          </button>
         </div>
       </div>
-    </div>
+
+      <input type="hidden" id="form_secret" 
+        value="<?php echo $_SESSION["form_secret"]?>">
   </body>
 </html>

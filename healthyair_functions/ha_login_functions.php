@@ -1,5 +1,5 @@
 <?php
-	require_once('../system_inits.php');
+	require_once('system_inits.php');
 
 	function ha_generate_login_hash($email) {
 		return $email . hash("whirlpool", $email . $secrert_word);

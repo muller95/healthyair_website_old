@@ -1,39 +1,18 @@
 <?php
-	require_once('system_inits.php');
+	require_once("system_inits.php");
 
-	if (!isset($_SESSION['uid']))
+	if ($_POST["form_secret"] != $_SESSION["form_secret"])
 		exit(0);
 
-	$uid = $_SESSION['uid'];
-	$stname = $_POST['stname'];
-
-	$query = "SELECT * from stations where user_id=" . 
-					$uid . " and name='" . $stname . "';";
-
-	if (!($result = $mysqli->query($query))) {
-		fprintf($stderr, 'Error_message: %s\n', $mysqli->error);
-		exit(1);
-	}	
-
-	if ($result->num_rows == 0) {
-		ECHO "no such meteostation;";
-		exit(0);
-	}
-
-	$row = $result->fetch_array();
-	$sid = $row['id'];
-	
-	/*$query = "SELECT t, rh, co2, datetime FROM air_data 
-				ORDER BY datetime DESC LIMIT 100;";*/
-
-	$limit = $_POST['limit'];
+	$station_id = $_POST["station_id"];
+	$limit = $_POST["limit"];
 	$query = sprintf("SELECT t, rh, co2, datetime FROM air_data 
-						WHERE station_id=%d
-						ORDER BY datetime DESC LIMIT %d;", $sid, $limit);
+		WHERE station_id=%d ORDER BY datetime DESC LIMIT %d;", 
+		$station_id, $limit);
 
 	$result = $mysqli->query($query);
 	if (!($result = $mysqli->query($query))) {
-		fprintf($stderr, 'Error_message: %s\n', $mysqli->error);
+		fprintf($stderr, "Error_message: %s\n", $mysqli->error);
 		exit(1);
 	}	
 
