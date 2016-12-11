@@ -30,29 +30,23 @@
 
     <script type="text/javascript">
       var meas_num = 0;
+      var category_id = -1;
       var station_id = null;
       var initiated = false;
 
-      var t_lowest = 0;
-      var t_mid = 25;
-      var t_high = 40;
-      var t_highest = 100;
+      var t_good_low, t_good_high;
+      var t_norm_low, t_norm_high;
       var temp_gauge_desktop, temp_gauge_mobile, temp_gauge_options;
       var temp_graphic, temp_graphic_options, temp_graphic_data;
       
       
-      var rh_lowest = 0;
-      var rh_mid = 50;
-      var rh_high = 70;
-      var rh_highest = 100;
+      var rh_good_low, rh_good_high;
+      var rh_norm_low, rh_norm_high;
       var rh_gauge_desktop, rh_gauge_mobile, rh_gauge_options;
       var rh_graphic, rh_graphic_options, rh_graphic_data;
 
       
-      var co2_lowest = 0;
-      var co2_mid = 1000;
-      var co2_high = 2500;
-      var co2_highest = 10000;
+      var co2_good_high, co2_norm_high;
       var co2_gauge_desktop, co2_gauge_mobile, co2_gauge_options;
       var co2_graphic, co2_graphic_options, co2_graphic_data;
 
@@ -72,21 +66,15 @@
       function init_charts() {
         temp_gauge_desktop = new google.visualization.Gauge(document.getElementById('temp_gauge_desktop'));
         temp_gauge_mobile = new google.visualization.Gauge(document.getElementById('temp_gauge_mobile'));
-        temp_gauge_options = {minorTicks:5, greenFrom:t_lowest, greenTo:t_mid,
-                    yellowFrom:t_mid, yellowTo:t_high, redFrom:t_high,
-                    redTo:t_highest};
+        temp_gauge_options = { minorTicks:5 };
 
         rh_gauge_desktop = new google.visualization.Gauge(document.getElementById('rh_gauge_desktop'));
         rh_gauge_mobile = new google.visualization.Gauge(document.getElementById('rh_gauge_mobile'));
-        rh_gauge_options = {minorTicks:5, greenFrom:rh_lowest, greenTo:rh_mid,
-                    yellowFrom:rh_mid, yellowTo:rh_high, redFrom:rh_high,
-                    redTo:rh_highest};
+        rh_gauge_options = { minorTicks:5 };
 
         co2_gauge_desktop = new google.visualization.Gauge(document.getElementById('co2_gauge_desktop'));
         co2_gauge_mobile = new google.visualization.Gauge(document.getElementById('co2_gauge_mobile'));
-        co2_gauge_options = {minorTicks:5, max:10000, greenFrom:co2_lowest, greenTo:co2_mid,
-                    yellowFrom:co2_mid, yellowTo:co2_high, redFrom:co2_high,
-                    redTo:co2_highest};
+        co2_gauge_options = { minorTicks:5, max:10000 };
 
 
         temp_graphic = new google.visualization.LineChart(document.getElementById('temp_graphic'));   
@@ -125,17 +113,81 @@
 
       }
 
+      function check_temp(t) {
+        if (t >= t_good_low && t <= t_good_high) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:rgb(33, 158, 33)">check</i>' + 
+            'В комнате идеальная температура.</li>';
+        } else if (t >= t_norm_low && t <= t_good_low) {
+          return '<li class="mdl-list__item"><i' +  
+          'class="material-icons" style="color:rgb(247, 226, 34)">warning</i>' + 
+          'В комнате допустимая температура, но уже холодновато.</li>';
+        } else if (t <= t_norm_low) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:#F00000">error</i>' + 
+            'В комнате холодно.</li>';
+        } else if (t >= t_good_high && t <= t_norm_high) {
+          return '<li class="mdl-list__item"><i ' +  
+            'class="material-icons" style="color:rgb(247, 226, 34)">warning</i>' + 
+            'В комнате допустимая температура, но уже жарковато.</li>';
+        } else if (t >= t_norm_high) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:#F00000">error</i>' + 
+            'В комнате жарко.</li>';
+        }
+      }
+
+      function check_rh(rh) {
+        if (rh >= rh_good_low && rh <= rh_good_high) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:rgb(33, 158, 33)">check</i>' + 
+            'В комнате идеальная влажность.</li>';
+        } else if (rh >= rh_norm_low && rh <= rh_good_low) {
+          return '<li class="mdl-list__item"><i' +  
+          'class="material-icons" style="color:rgb(247, 226, 34)">warning</i>' + 
+          'В комнате допустимая влажность, но уже суховато.</li>';
+        } else if (rh <= rh_norm_low) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:#F00000">error</i>' + 
+            'В комнате сухой воздух.</li>';
+        } else if (rh >= rh_good_high && t <= rh_norm_high) {
+          return '<li class="mdl-list__item"><i' +  
+            'class="material-icons" style="color:rgb(247, 226, 34)">warning</i>' + 
+            'В комнате допустимая влажность, но уже сыровато.</li>';
+        } else if (rh >= rh_norm_high) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:#F00000">error</i>' + 
+            'В комнате сырой воздух.</li>';
+        }
+      }
+
+      function check_co2(co2) {
+        if (co2 <= co2_good_high) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:rgb(33, 158, 33)">check</i>' + 
+            'В очень чистый воздух, концентрация CO2 оптимальная.</li>';
+        } else if (co2 <= co2_norm_high) {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:#F00000">warning</i>' + 
+            'Концентрация CO2 в пределах нормы, но стоит проветрить комнату.</li>';
+        } else {
+          return '<li class="mdl-list__item"><i ' + 
+            'class="material-icons" style="color:#F00000">error</i>' + 
+            'Концентрация CO2 слишком высокая, нужно проветрить комнату.</li>';
+        }
+      }
+
       function request_gauges_data() {
         var form_secret = document.getElementById("form_secret").value;
+        var quality_comments = document.getElementById("quality_comments");
 
-        if (!initiated || !station_id)
+        if (!initiated || !station_id || category_id < 0)
           return;
-
-
         
         $.post("json_response.php", { station_id: station_id, limit:1, 
           form_secret: form_secret }, 
           function(data) {
+            var temp_message, rh_message, co2_message;
             var json_strings = JSON.parse(data);
             
             var t = 0, rh = 0, co2 = 0;
@@ -146,28 +198,39 @@
               t = parseFloat(meas_params["t"]);
               rh = parseFloat(meas_params["rh"]);
               co2 = parseFloat(meas_params["co2"]);
-          }
-          
-                var temp_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
-                ['T', t]]);
-                temp_gauge_desktop.draw(temp_gauge_data, temp_gauge_options);
-                temp_gauge_mobile.draw(temp_gauge_data, temp_gauge_options);
 
-                var rh_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
-                ['RH', rh]]);
-                rh_gauge_desktop.draw(rh_gauge_data, rh_gauge_options);
-                rh_gauge_mobile.draw(rh_gauge_data, rh_gauge_options);
+              quality_comments.style.display = "";
+            } else 
+              quality_comments.style.display = "none";
+
+            temp_message = check_temp(t);
+            rh_message = check_rh(rh);
+            co2_message = check_co2(co2);
+
+            var temp_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
+              ['T', t]]);
+            temp_gauge_desktop.draw(temp_gauge_data, temp_gauge_options);
+            temp_gauge_mobile.draw(temp_gauge_data, temp_gauge_options);
+
+            var rh_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
+              ['RH', rh]]);
+              rh_gauge_desktop.draw(rh_gauge_data, rh_gauge_options);
+              rh_gauge_mobile.draw(rh_gauge_data, rh_gauge_options);
           
-                var co2_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
-                ['CO2', co2]]);
-                co2_gauge_desktop.draw(co2_gauge_data, co2_gauge_options);
-                co2_gauge_mobile.draw(co2_gauge_data, co2_gauge_options);
-        });
+            var co2_gauge_data = google.visualization.arrayToDataTable([['Label', 'Value'],
+              ['CO2', co2]]);
+              co2_gauge_desktop.draw(co2_gauge_data, co2_gauge_options);
+              co2_gauge_mobile.draw(co2_gauge_data, co2_gauge_options);
+
+              
+              quality_comments.innerHTML = temp_message + rh_message + 
+                co2_message;
+          });
       }
 
       function request_graphics_data() {
         var form_secret = document.getElementById("form_secret").value;
-        if (!initiated || !station_id)
+        if (!initiated || !station_id || category_id < 0)
           return;
 
         $.post("json_response.php", { station_id: station_id, limit:100 , form_secret: form_secret }, 
@@ -197,13 +260,66 @@
         function set_station_id(radio) {
           radio.checked = true;
           station_id = radio.value;
+          set_category_id();
         }
 
-        function upgrade_radios() {
-          var radios;
-          alert('here');
-          radios = document.getElementsByName("station_radios");
-          alert(station_radios);
+        function get_category_params() {
+          var form_secret = document.getElementById("form_secret").value;
+
+          $.post("get_category_params.php", { category_id: category_id,
+            form_secret: form_secret },
+            function (data) {
+              category_params = JSON.parse(data);
+              
+              t_good_low = category_params["t_good_low"];
+              t_good_high = category_params["t_good_high"];
+              t_nrom_low = category_params["t_norm_low"];
+              t_norm_high = category_params["t_norm_high"];
+
+              rh_good_low = category_params["rh_good_low"];
+              rh_good_high = category_params["rh_good_high"];
+              rh_nrom_low = category_params["rh_norm_low"];
+              rh_norm_high = category_params["rh_norm_high"];
+
+              co2_good_high = category_params["co2_good_high"];
+              co2_norm_high = category_params["co2_norm_high"];
+            })
+        }
+
+        function set_category_id() {
+          var form_secret = document.getElementById("form_secret").value;
+
+          $.post("get_category_id.php", { station_id: station_id, 
+            form_secret: form_secret }, 
+            function(data) {
+              category_id = data;
+              get_category_params();
+            });
+        }
+
+        function set_station_category(new_category_id) {
+          var form_secret = document.getElementById("form_secret").value;
+
+          $.post("set_station_category.php", 
+            { new_category_id: new_category_id, station_id: station_id, 
+              form_secret: form_secret }, 
+            function(data) {
+              set_category_id();
+            });
+        }
+
+        function init_page() {
+          try_get_stations();
+          get_categories();
+        }
+
+        function get_categories() {
+          var form_secret = document.getElementById("form_secret").value;
+          
+          $.post("get_categories.php", { form_secret: form_secret },
+            function (data) {
+              document.getElementById("category_menu").innerHTML = data;
+            });
         }
 
         function try_get_stations() {
@@ -222,8 +338,7 @@
 
                 stations.innerHTML = data;
                 radios = document.getElementsByName('station_radios');
-                set_station_id(radios[0]);
-              
+                set_station_id(radios[0]);              
               }
             });
         }
@@ -361,7 +476,7 @@
 
   </head>
 
-  <body onload="try_get_stations()" style="background-color: #EAEAEA"> 
+  <body onload="init_page()" style="background-color: #EAEAEA"> 
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
@@ -433,11 +548,24 @@
         <!--Statistics card-->
         <div class="mdl-card mdl-cell mdl-cell--9-col mdl-cell--8-col-tablet 
           mdl-cell--4-col-phone mdl-shadow--2dp mdl-card--border">
+          <!-- Menu of statistics -->
           <div class="mdl-card__title healthyair_font" 
             style="background: rgb(33, 158, 33); font-size:20pt;
             color:#FAFAFA">
+            <button id="menu"
+              class="mdl-button mdl-js-button mdl-button--icon">
+              <i class="material-icons">menu</i>
+            </button>
+
+            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect"
+                id="category_menu" for="menu">
+            </ul>
             Статистика
           </div>
+
+          <!-- List of air status comments -->
+          <ul  class="mdl-list" id="quality_comments">
+          </ul>
 
           <!--Statistics card actions -->
           <div class="mdl-card__actions mdl-card--border mdl-grid">           
@@ -493,9 +621,6 @@
                 <i class="material-icons">keyboard_arrow_down</i>
               </button>
             </div>
-            
-
-
                
             <!-- Graphics -->
             <div class="mdl-cell mdl-cell--12-col" id="graphics">
