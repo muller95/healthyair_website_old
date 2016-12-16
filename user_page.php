@@ -143,14 +143,14 @@
             'class="material-icons" style="color:rgb(33, 158, 33)">check</i>' + 
             'В комнате идеальная влажность.</li>';
         } else if (rh >= rh_norm_low && rh <= rh_good_low) {
-          return '<li class="mdl-list__item"><i' +  
+          return '<li class="mdl-list__item"><i ' +  
           'class="material-icons" style="color:rgb(247, 226, 34)">warning</i>' + 
           'В комнате допустимая влажность, но уже суховато.</li>';
         } else if (rh <= rh_norm_low) {
           return '<li class="mdl-list__item"><i ' + 
             'class="material-icons" style="color:#F00000">error</i>' + 
             'В комнате сухой воздух.</li>';
-        } else if (rh >= rh_good_high && t <= rh_norm_high) {
+        } else if (rh >= rh_good_high && rh <= rh_norm_high) {
           return '<li class="mdl-list__item"><i' +  
             'class="material-icons" style="color:rgb(247, 226, 34)">warning</i>' + 
             'В комнате допустимая влажность, но уже сыровато.</li>';
@@ -278,7 +278,7 @@
 
               rh_good_low = category_params["rh_good_low"];
               rh_good_high = category_params["rh_good_high"];
-              rh_nrom_low = category_params["rh_norm_low"];
+              rh_norm_low = category_params["rh_norm_low"];
               rh_norm_high = category_params["rh_norm_high"];
 
               co2_good_high = category_params["co2_good_high"];
